@@ -168,6 +168,16 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
   box-shadow:0 0 12px rgba(0,229,255,0.1)}
 .adv span{font-size:7px;color:rgba(255,255,255,0.2);letter-spacing:0.8px;font-family:'Rajdhani';font-weight:600}
 
+/* Mic status */
+.mic-status{position:absolute;top:58px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:5px;padding:3px 12px;
+  background:rgba(0,0,0,0.6);border:1px solid rgba(0,229,255,0.15);border-radius:14px;
+  font-size:8px;color:rgba(0,229,255,0.6);letter-spacing:1.5px;font-family:'Orbitron';
+  z-index:100;opacity:0;transition:opacity 0.4s;pointer-events:none}
+.mic-status.on{opacity:1}
+.mic-status .mic-dot{width:5px;height:5px;border-radius:50%;background:#00e5ff;
+  box-shadow:0 0 6px #00e5ff;animation:blink 1.5s ease-in-out infinite}
+
 /* Bottom bar */
 .bbar{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;z-index:10}
 .bbar .pill{width:134px;height:5px;background:rgba(255,255,255,0.25);border-radius:3px}
@@ -273,6 +283,7 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
       <button class="adv"><div class="ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div><span>QUEUE</span></button>
     </div>
 
+    <div class="mic-status" id="micStatus"><div class="mic-dot"></div>MIC ACTIVE &middot; LIVE AUDIO</div>
     <div class="bbar"><div class="pill"></div></div>
   </div>
 </div>
@@ -311,11 +322,12 @@ const vizBars=64;
 const vizData=Array(vizBars).fill(0);
 const vizTarget=Array(vizBars).fill(0);
 
-function genVizTargets(){
-  for(let i=0;i<vizBars;i++) vizTarget[i]=0.15+Math.random()*0.85;
-  setTimeout(genVizTargets,120+Math.random()*80);
+// Fallback random targets when mic is off
+function genVizTargetsFallback(){
+  if(!micActive) for(let i=0;i<vizBars;i++) vizTarget[i]=0.15+Math.random()*0.85;
+  setTimeout(genVizTargetsFallback,120+Math.random()*80);
 }
-genVizTargets();
+genVizTargetsFallback();
 
 function drawViz(t){
   vctx.clearRect(0,0,310,310);
@@ -351,11 +363,11 @@ const wBars=100;
 const wData=Array(wBars).fill(0);
 const wTarget=Array(wBars).fill(0);
 
-function genWaveTargets(){
-  for(let i=0;i<wBars;i++) wTarget[i]=0.1+Math.random()*0.9;
-  setTimeout(genWaveTargets,100+Math.random()*60);
+function genWaveTargetsFallback(){
+  if(!micActive) for(let i=0;i<wBars;i++) wTarget[i]=0.1+Math.random()*0.9;
+  setTimeout(genWaveTargetsFallback,100+Math.random()*60);
 }
-genWaveTargets();
+genWaveTargetsFallback();
 
 function drawWave(t){
   wctx.clearRect(0,0,333,32);
@@ -441,8 +453,62 @@ for(let i=0;i<60;i++){
   });
 }
 
+// ========== MICROPHONE AUDIO ENGINE ==========
+let micActive = false;
+let audioCtx, analyser, freqData, timeDomainData;
+const micStatusEl = document.getElementById('micStatus');
+
+async function initMic() {
+  if (micActive) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256; // 128 frequency bins
+    analyser.smoothingTimeConstant = 0.75;
+    source.connect(analyser);
+    freqData = new Uint8Array(analyser.frequencyBinCount);
+    timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+    micActive = true;
+    micStatusEl.classList.add('on');
+  } catch (e) {
+    console.warn('Mic access denied, using fallback animation.', e);
+  }
+}
+
+function updateFromMic() {
+  if (!micActive || !analyser) return;
+  analyser.getByteFrequencyData(freqData);
+  analyser.getByteTimeDomainData(timeDomainData);
+
+  // Feed circular visualizer (64 bars from 128 freq bins — take every other)
+  for (let i = 0; i < vizBars; i++) {
+    const fi = Math.floor((i / vizBars) * freqData.length);
+    vizTarget[i] = freqData[fi] / 255;
+  }
+
+  // Feed waveform (100 bars from time domain)
+  for (let i = 0; i < wBars; i++) {
+    const ti = Math.floor((i / wBars) * timeDomainData.length);
+    wTarget[i] = Math.abs(timeDomainData[ti] - 128) / 128;
+  }
+
+  // Feed EQ (10 bands mapped to frequency ranges)
+  const binsPer = Math.floor(freqData.length / eqBands.length);
+  eqBands.forEach((b, i) => {
+    let sum = 0;
+    for (let j = i * binsPer; j < (i + 1) * binsPer && j < freqData.length; j++) sum += freqData[j];
+    b.base = (sum / binsPer) / 255;
+  });
+}
+
+// Tap play button to activate mic
+document.querySelector('.play').addEventListener('click', initMic);
+
 // ========== MAIN LOOP ==========
 function loop(t){
+  updateFromMic();
   drawAmbient(t);
   drawViz(t);
   drawWave(t);
