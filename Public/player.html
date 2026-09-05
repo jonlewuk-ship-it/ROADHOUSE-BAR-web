@@ -532,9 +532,14 @@ function updateFromMic() {
   });
 }
 
-// Use ontouchstart (fires immediately on Safari) + onclick fallback
+// Play button also triggers mic
 playBtn.ontouchstart = function(e){ e.preventDefault(); initMic(); };
 playBtn.onclick = initMic;
+
+// ========== EQ CANVAS SIZE (once, not per frame) ==========
+function sizeEQ(){ eqc.width = eqc.parentElement.clientWidth; }
+sizeEQ();
+window.addEventListener('resize', sizeEQ);
 
 // ========== MAIN LOOP ==========
 function loop(t){
@@ -542,13 +547,31 @@ function loop(t){
   drawAmbient(t);
   drawViz(t);
   drawWave(t);
-  eqc.width=eqc.parentElement.clientWidth;
   drawEQ(t);
   requestAnimationFrame(loop);
 }
+setTimeout(function(){ requestAnimationFrame(loop); }, 200);
 
-// Wait for font + image load
-setTimeout(()=>{requestAnimationFrame(loop)},200);
+// ========== TAP-TO-START OVERLAY (iOS Safari mic workaround) ==========
+(function(){
+  var ov = document.createElement('div');
+  ov.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:16px;position:relative"><div style="position:absolute;width:90px;height:90px;border-radius:50%;border:1px solid rgba(0,229,255,0.2);animation:tapP 2s ease-out infinite"></div><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg><div style="font-family:Orbitron,sans-serif;font-size:13px;color:rgba(0,229,255,0.7);text-align:center;letter-spacing:3px;line-height:1.8">TAP TO ACTIVATE<br>LIVE AUDIO</div></div>';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity 0.5s';
+  var ks = document.createElement('style');
+  ks.textContent = '@keyframes tapP{0%{transform:scale(1);opacity:0.5}100%{transform:scale(1.8);opacity:0}}';
+  document.head.appendChild(ks);
+  document.body.appendChild(ov);
+  function go(e){
+    e.preventDefault();
+    e.stopPropagation();
+    ov.style.opacity='0';
+    ov.style.pointerEvents='none';
+    setTimeout(function(){ ov.remove(); },600);
+    initMic();
+  }
+  ov.addEventListener('touchstart', go, {passive:false});
+  ov.addEventListener('click', go);
+})();
 </script>
 </body>
 </html>
