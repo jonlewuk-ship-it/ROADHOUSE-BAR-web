@@ -457,23 +457,45 @@ for(let i=0;i<60;i++){
 let micActive = false;
 let audioCtx, analyser, freqData, timeDomainData;
 const micStatusEl = document.getElementById('micStatus');
+const playBtn = document.querySelector('.play');
+const playSvg = playBtn.querySelector('svg');
 
 async function initMic() {
   if (micActive) return;
+
+  // Safari: resume a suspended AudioContext inside user gesture
+  if (audioCtx && audioCtx.state === 'suspended') {
+    await audioCtx.resume();
+  }
+
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+    });
+
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Safari may start suspended even after creation — resume inside gesture
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
     const source = audioCtx.createMediaStreamSource(stream);
     analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256; // 128 frequency bins
-    analyser.smoothingTimeConstant = 0.75;
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.72;
     source.connect(analyser);
     freqData = new Uint8Array(analyser.frequencyBinCount);
     timeDomainData = new Uint8Array(analyser.frequencyBinCount);
     micActive = true;
     micStatusEl.classList.add('on');
+    // Swap play icon to a "live" pause icon
+    playSvg.innerHTML = '<rect x="7" y="5" width="3.5" height="14" rx="1" fill="#fff"/><rect x="13.5" y="5" width="3.5" height="14" rx="1" fill="#fff"/>';
   } catch (e) {
-    console.warn('Mic access denied, using fallback animation.', e);
+    console.error('Mic init failed:', e);
+    // Show inline feedback instead of silent fail
+    micStatusEl.textContent = 'MIC DENIED — TAP SETTINGS';
+    micStatusEl.style.color = '#ef5350';
+    micStatusEl.style.borderColor = 'rgba(239,83,80,0.3)';
+    micStatusEl.classList.add('on');
+    setTimeout(() => micStatusEl.classList.remove('on'), 3000);
   }
 }
 
@@ -482,7 +504,7 @@ function updateFromMic() {
   analyser.getByteFrequencyData(freqData);
   analyser.getByteTimeDomainData(timeDomainData);
 
-  // Feed circular visualizer (64 bars from 128 freq bins — take every other)
+  // Feed circular visualizer (64 bars from 128 freq bins)
   for (let i = 0; i < vizBars; i++) {
     const fi = Math.floor((i / vizBars) * freqData.length);
     vizTarget[i] = freqData[fi] / 255;
@@ -503,8 +525,9 @@ function updateFromMic() {
   });
 }
 
-// Tap play button to activate mic
-document.querySelector('.play').addEventListener('click', initMic);
+// Safari needs both click AND touchend for reliable gesture detection
+playBtn.addEventListener('click', initMic);
+playBtn.addEventListener('touchend', (e) => { e.preventDefault(); initMic(); });
 
 // ========== MAIN LOOP ==========
 function loop(t){
