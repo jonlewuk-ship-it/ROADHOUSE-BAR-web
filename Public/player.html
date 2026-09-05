@@ -140,7 +140,7 @@ body{background:#000;display:flex;justify-content:center;align-items:center;min-
   box-shadow:0 0 30px rgba(0,229,255,0.3),0 0 60px rgba(124,77,255,0.15);transition:0.2s}
 .play:hover{transform:scale(1.08);box-shadow:0 0 40px rgba(0,229,255,0.5)}
 .play::before{content:'';position:absolute;inset:-4px;border-radius:50%;
-  border:1px solid rgba(0,229,255,0.2);animation:playRing 3s linear infinite}
+  border:1px solid rgba(0,229,255,0.2);animation:playRing 3s linear infinite;pointer-events:none}
 @keyframes playRing{0%{transform:scale(1);opacity:0.4}100%{transform:scale(1.3);opacity:0}}
 .play svg{position:absolute;top:50%;left:52%;transform:translate(-50%,-50%);color:#fff}
 
@@ -460,24 +460,35 @@ const micStatusEl = document.getElementById('micStatus');
 const playBtn = document.querySelector('.play');
 const playSvg = playBtn.querySelector('svg');
 
-async function initMic() {
+function initMic() {
   if (micActive) return;
 
-  // Safari: resume a suspended AudioContext inside user gesture
-  if (audioCtx && audioCtx.state === 'suspended') {
-    await audioCtx.resume();
+  // Check if getUserMedia is available at all
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    micStatusEl.textContent = 'MIC NOT SUPPORTED';
+    micStatusEl.style.color = '#ef5350';
+    micStatusEl.style.borderColor = 'rgba(239,83,80,0.3)';
+    micStatusEl.classList.add('on');
+    return;
   }
 
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-    });
+  // Show "connecting" immediately so user knows tap registered
+  micStatusEl.textContent = 'CONNECTING MIC…';
+  micStatusEl.style.color = 'rgba(0,229,255,0.6)';
+  micStatusEl.style.borderColor = 'rgba(0,229,255,0.15)';
+  micStatusEl.classList.add('on');
 
+  // Create AudioContext synchronously inside gesture (Safari requirement)
+  if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // Safari may start suspended even after creation — resume inside gesture
-    if (audioCtx.state === 'suspended') await audioCtx.resume();
+  }
+  // Resume synchronously inside gesture
+  audioCtx.resume();
 
-    const source = audioCtx.createMediaStreamSource(stream);
+  navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+  }).then(function(stream) {
+    var source = audioCtx.createMediaStreamSource(stream);
     analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
     analyser.smoothingTimeConstant = 0.72;
@@ -485,18 +496,17 @@ async function initMic() {
     freqData = new Uint8Array(analyser.frequencyBinCount);
     timeDomainData = new Uint8Array(analyser.frequencyBinCount);
     micActive = true;
-    micStatusEl.classList.add('on');
-    // Swap play icon to a "live" pause icon
+    micStatusEl.innerHTML = '<span class="mic-dot"></span> MIC ACTIVE &middot; LIVE AUDIO';
+    micStatusEl.style.color = 'rgba(0,229,255,0.6)';
+    micStatusEl.style.borderColor = 'rgba(0,229,255,0.15)';
     playSvg.innerHTML = '<rect x="7" y="5" width="3.5" height="14" rx="1" fill="#fff"/><rect x="13.5" y="5" width="3.5" height="14" rx="1" fill="#fff"/>';
-  } catch (e) {
-    console.error('Mic init failed:', e);
-    // Show inline feedback instead of silent fail
-    micStatusEl.textContent = 'MIC DENIED — TAP SETTINGS';
+  }).catch(function(e) {
+    console.error('Mic error:', e);
+    micStatusEl.textContent = 'MIC DENIED — CHECK SETTINGS';
     micStatusEl.style.color = '#ef5350';
     micStatusEl.style.borderColor = 'rgba(239,83,80,0.3)';
-    micStatusEl.classList.add('on');
-    setTimeout(() => micStatusEl.classList.remove('on'), 3000);
-  }
+    setTimeout(function(){ micStatusEl.classList.remove('on'); }, 4000);
+  });
 }
 
 function updateFromMic() {
@@ -504,30 +514,27 @@ function updateFromMic() {
   analyser.getByteFrequencyData(freqData);
   analyser.getByteTimeDomainData(timeDomainData);
 
-  // Feed circular visualizer (64 bars from 128 freq bins)
-  for (let i = 0; i < vizBars; i++) {
-    const fi = Math.floor((i / vizBars) * freqData.length);
+  for (var i = 0; i < vizBars; i++) {
+    var fi = Math.floor((i / vizBars) * freqData.length);
     vizTarget[i] = freqData[fi] / 255;
   }
 
-  // Feed waveform (100 bars from time domain)
-  for (let i = 0; i < wBars; i++) {
-    const ti = Math.floor((i / wBars) * timeDomainData.length);
+  for (var i = 0; i < wBars; i++) {
+    var ti = Math.floor((i / wBars) * timeDomainData.length);
     wTarget[i] = Math.abs(timeDomainData[ti] - 128) / 128;
   }
 
-  // Feed EQ (10 bands mapped to frequency ranges)
-  const binsPer = Math.floor(freqData.length / eqBands.length);
-  eqBands.forEach((b, i) => {
-    let sum = 0;
-    for (let j = i * binsPer; j < (i + 1) * binsPer && j < freqData.length; j++) sum += freqData[j];
+  var binsPer = Math.floor(freqData.length / eqBands.length);
+  eqBands.forEach(function(b, i) {
+    var sum = 0;
+    for (var j = i * binsPer; j < (i + 1) * binsPer && j < freqData.length; j++) sum += freqData[j];
     b.base = (sum / binsPer) / 255;
   });
 }
 
-// Safari needs both click AND touchend for reliable gesture detection
-playBtn.addEventListener('click', initMic);
-playBtn.addEventListener('touchend', (e) => { e.preventDefault(); initMic(); });
+// Use ontouchstart (fires immediately on Safari) + onclick fallback
+playBtn.ontouchstart = function(e){ e.preventDefault(); initMic(); };
+playBtn.onclick = initMic;
 
 // ========== MAIN LOOP ==========
 function loop(t){
