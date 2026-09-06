@@ -1,409 +1,321 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Antonio M. De Palma — Knowledge Universe</title>
+<title>Il Mio Universo Professionale</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#03050d;touch-action:none}
-
 #bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 #conn{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
 #viewport{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;overflow:hidden;cursor:grab}
 #viewport.drag{cursor:grabbing}
 #stage{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;will-change:transform}
 
+/* GLASS NODES */
 .nd{position:absolute;transform-style:preserve-3d;cursor:pointer;transition:filter .25s}
-.nd:hover{filter:brightness(1.25) drop-shadow(0 0 10px var(--g));z-index:20}
+.nd:hover{filter:brightness(1.22) drop-shadow(0 0 12px var(--g));z-index:20}
 .nd:hover .nc{border-color:var(--g)}
-
 .nc{
-  width:var(--w);padding:14px 16px 13px;border-radius:14px;
+  width:var(--w);padding:15px 17px 14px;border-radius:16px;
   border:1px solid var(--b);
-  background:linear-gradient(155deg,var(--bg1),var(--bg2));
-  backdrop-filter:blur(18px);
-  box-shadow:0 0 18px var(--gs),0 0 50px var(--gf),inset 0 1px 0 rgba(255,255,255,.05);
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015)),linear-gradient(155deg,var(--bg1),var(--bg2));
+  backdrop-filter:blur(22px) saturate(1.3);-webkit-backdrop-filter:blur(22px) saturate(1.3);
+  box-shadow:0 0 20px var(--gs),0 8px 32px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 0 rgba(0,0,0,.2);
   position:relative;overflow:hidden;transform:translate(-50%,-50%);
 }
-.nc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--g) 50%,transparent 95%);opacity:.45}
+.nc::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 5%,var(--g) 50%,transparent 95%);opacity:.55}
+.nc::after{content:'';position:absolute;top:-40%;left:-30%;width:60%;height:120%;background:linear-gradient(115deg,rgba(255,255,255,.08),transparent 60%);transform:rotate(8deg);pointer-events:none}
+.ni{font-size:18px;margin-bottom:6px;display:block;line-height:1}
+.nt{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;color:#f0f3f8;letter-spacing:-.2px;line-height:1.25;margin-bottom:3px}
+.np{font-size:9px;color:var(--gb);font-weight:600;margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+.nd-desc{font-size:10px;color:#8a9bb8;line-height:1.5}
+.tg{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px}
+.tg span{font-size:8px;padding:2px 7px;border-radius:5px;font-weight:500;background:var(--tb);color:var(--gb);border:1px solid var(--tbo);letter-spacing:.15px}
 
-.ni{font-size:17px;margin-bottom:5px;display:block;line-height:1}
-.nt{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#e4e8f0;letter-spacing:-.2px;line-height:1.25;margin-bottom:3px}
-.np{font-size:9px;color:var(--g);font-weight:600;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase}
-.nd-desc{font-size:10px;color:#7a8ba8;line-height:1.5}
-.tg{display:flex;flex-wrap:wrap;gap:3px;margin-top:7px}
-.tg span{font-size:8px;padding:2px 6px;border-radius:4px;font-weight:500;background:var(--tb);color:var(--g);border:1px solid var(--tbo);letter-spacing:.15px}
-.tl-dot{position:absolute;bottom:-18px;left:50%;width:8px;height:8px;border-radius:50%;background:var(--g);transform:translateX(-50%);box-shadow:0 0 8px var(--gs)}
+.flags-card .nc{text-align:center;padding:20px 22px}
+.flags-glow{font-size:38px;letter-spacing:14px;display:block;margin-bottom:8px;animation:flagPulse 3s ease-in-out infinite}
+@keyframes flagPulse{0%,100%{filter:drop-shadow(0 0 14px rgba(94,234,212,.25)) drop-shadow(0 0 28px rgba(224,201,127,.12))}50%{filter:drop-shadow(0 0 24px rgba(94,234,212,.5)) drop-shadow(0 0 48px rgba(224,201,127,.25))}}
 
-/* ═══ FULLSCREEN FLIP OVERLAY ═══ */
-#flip-overlay{
-  position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;
-  pointer-events:none;opacity:0;transition:opacity .35s;
-}
+/* TIMELINE YEAR MARKERS */
+.ym{position:absolute;transform-style:preserve-3d;pointer-events:none;will-change:transform}
+.yd{width:11px;height:11px;border-radius:50%;background:var(--yc);box-shadow:0 0 14px var(--yc),0 0 28px var(--yc),0 0 42px var(--yc);transform:translate(-50%,-50%);animation:yPulse 2.6s ease-in-out infinite}
+.yl{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;color:#f0f3f8;letter-spacing:.5px;text-shadow:0 0 10px var(--yc),0 0 20px rgba(0,0,0,.6);white-space:nowrap}
+@keyframes yPulse{0%,100%{opacity:.75}50%{opacity:1;box-shadow:0 0 20px var(--yc),0 0 40px var(--yc),0 0 60px var(--yc)}}
+
+/* Vertical wire from card to timeline dot */
+.wire{position:absolute;transform-style:preserve-3d;pointer-events:none;width:1px;background:linear-gradient(180deg,transparent,var(--wc) 50%,transparent);opacity:.35;transform-origin:top center}
+
+/* OVERLAY */
+#flip-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;pointer-events:none;opacity:0;transition:opacity .35s}
 #flip-overlay.open{pointer-events:auto;opacity:1}
-#flip-backdrop{
-  position:absolute;top:0;left:0;width:100%;height:100%;
-  background:rgba(3,5,13,.8);backdrop-filter:blur(20px);
-}
-#flip-container{
-  position:absolute;transform-style:preserve-3d;
-  transition:all .7s cubic-bezier(.4,.0,.15,1);
-}
+#flip-backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(3,5,13,.78);backdrop-filter:blur(22px)}
+#flip-container{position:absolute;transform-style:preserve-3d;transition:all .7s cubic-bezier(.4,.0,.15,1)}
 #flip-container.flipped{transform:translate(-50%,-50%) rotateY(180deg) !important}
-
-.flip-face{
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;
-  border-radius:18px;overflow:hidden;
-  border:1px solid rgba(94,234,212,.15);
-  background:linear-gradient(155deg,rgba(14,20,40,.97),rgba(6,10,22,.98));
-  box-shadow:0 0 40px rgba(94,234,212,.06),0 20px 60px rgba(0,0,0,.5);
-}
-
-#flip-front{
-  width:100%;height:100%;
-  padding:14px 16px 13px;
-  display:flex;flex-direction:column;justify-content:center;
-}
-#flip-back{
-  position:absolute;top:0;left:0;
-  transform:rotateY(180deg);
-  overflow-y:auto;
-  scrollbar-width:thin;scrollbar-color:rgba(94,234,212,.15) transparent;
-}
+.flip-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;overflow:hidden;border:1px solid rgba(94,234,212,.18);background:linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.01)),linear-gradient(155deg,rgba(16,22,42,.94),rgba(8,12,24,.97));backdrop-filter:blur(30px) saturate(1.2);box-shadow:0 0 50px rgba(94,234,212,.08),0 25px 70px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.1)}
+#flip-front{width:100%;height:100%;padding:15px 17px 14px;display:flex;flex-direction:column;justify-content:center}
+#flip-back{position:absolute;top:0;left:0;transform:rotateY(180deg);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(94,234,212,.18) transparent}
 #flip-back::-webkit-scrollbar{width:5px}
-#flip-back::-webkit-scrollbar-thumb{background:rgba(94,234,212,.15);border-radius:3px}
-
-#fb-close{
-  position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;
-  padding:16px 20px 0;
-  background:linear-gradient(180deg,rgba(10,16,34,.98) 60%,transparent);
-}
-#fb-close button{
-  width:36px;height:36px;border-radius:10px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  color:#6b7a96;font-size:16px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;
-}
-#fb-close button:hover{background:rgba(255,255,255,.1);color:#e4e8f0}
-
-#fb-header{padding:0 28px 0;margin-bottom:4px}
-#fb-icon{font-size:28px;margin-bottom:8px;display:block}
-#fb-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#e4e8f0;line-height:1.2;margin-bottom:3px}
-#fb-period{font-size:12px;color:#5eead4;font-weight:600;letter-spacing:.4px}
-
-#fb-body{padding:8px 28px 32px;font-size:14px;line-height:1.75;color:#8c9bb5}
-#fb-body h3{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#c5cfe0;margin:22px 0 8px}
+#flip-back::-webkit-scrollbar-thumb{background:rgba(94,234,212,.18);border-radius:3px}
+#fb-close{position:sticky;top:0;z-index:5;display:flex;justify-content:flex-end;padding:14px 18px 0;background:linear-gradient(180deg,rgba(12,18,36,.98) 60%,transparent)}
+#fb-close button{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#7a8ba8;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+#fb-close button:hover{background:rgba(255,255,255,.12);color:#f0f3f8}
+#fb-header{padding:0 26px 0;margin-bottom:4px}
+#fb-icon{font-size:28px;margin-bottom:6px;display:block}
+#fb-title{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#f0f3f8;line-height:1.2;margin-bottom:3px}
+#fb-period{font-size:12px;color:#7de8d8;font-weight:600;letter-spacing:.4px}
+#fb-body{padding:8px 26px 30px;font-size:13.5px;line-height:1.75;color:#98a8c2}
+#fb-body h3{font-family:'Space Grotesk',sans-serif;font-size:14.5px;font-weight:600;color:#d0dae8;margin:20px 0 7px}
 #fb-body h3:first-child{margin-top:6px}
-#fb-body ul{padding-left:18px;margin:6px 0}
+#fb-body ul{padding-left:17px;margin:6px 0}
 #fb-body li{margin-bottom:5px}
-#fb-body .hl{color:#e4e8f0;font-weight:500}
-#fb-body .tag{display:inline-block;padding:4px 11px;border-radius:6px;font-size:11px;font-weight:500;margin:2px 3px 2px 0;background:rgba(94,234,212,.06);color:#5eead4;border:1px solid rgba(94,234,212,.1)}
-#fb-body .ins{padding:12px 16px;border-radius:10px;margin:12px 0;background:rgba(94,234,212,.03);border-left:3px solid rgba(94,234,212,.25);font-size:13px;color:#9ab0c8}
-#fb-body .ins strong{color:#5eead4;font-weight:600}
-#fb-body .mt{display:inline-block;padding:10px 14px;border-radius:10px;margin:4px;background:rgba(94,234,212,.04);border:1px solid rgba(94,234,212,.07);text-align:center}
-#fb-body .mt .v{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#5eead4;display:block}
-#fb-body .mt .l{font-size:9px;color:#506580;margin-top:2px;display:block;text-transform:uppercase;letter-spacing:.5px}
+#fb-body .hl{color:#f0f3f8;font-weight:500}
+#fb-body .tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10.5px;font-weight:500;margin:2px 3px 2px 0;background:rgba(94,234,212,.08);color:#7de8d8;border:1px solid rgba(94,234,212,.14)}
+#fb-body .ins{padding:11px 15px;border-radius:10px;margin:11px 0;background:linear-gradient(135deg,rgba(94,234,212,.05),rgba(94,234,212,.01));border-left:3px solid rgba(94,234,212,.35);font-size:12.5px;color:#a8bcd4}
+#fb-body .ins strong{color:#7de8d8;font-weight:600}
+#fb-body .mt{display:inline-block;padding:10px 14px;border-radius:10px;margin:4px;background:linear-gradient(135deg,rgba(94,234,212,.06),rgba(94,234,212,.01));border:1px solid rgba(94,234,212,.1);text-align:center}
+#fb-body .mt .v{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;color:#7de8d8;display:block}
+#fb-body .mt .l{font-size:9px;color:#5a7090;margin-top:2px;display:block;text-transform:uppercase;letter-spacing:.5px}
+#fb-body a.li{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:10px;margin-top:8px;background:linear-gradient(135deg,rgba(10,102,194,.18),rgba(10,102,194,.06));border:1px solid rgba(10,102,194,.35);color:#5eb3f5;text-decoration:none;font-size:12.5px;font-weight:600;transition:all .2s}
+#fb-body a.li:hover{background:linear-gradient(135deg,rgba(10,102,194,.28),rgba(10,102,194,.12));border-color:rgba(10,102,194,.55)}
+.photo-slot{width:100%;height:150px;border-radius:12px;margin:10px 0;background:linear-gradient(135deg,rgba(94,234,212,.04),rgba(167,139,250,.04));border:1px dashed rgba(94,234,212,.2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5a7090;font-size:11px;text-align:center;padding:12px}
+.photo-slot .em{font-size:26px}
 
-/* HUD */
 #hud{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none}
-#hd{position:absolute;top:16px;left:18px;pointer-events:auto}
-#hd h1{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:800;color:#e4e8f0;letter-spacing:-.3px}
-#hd h1 em{font-style:normal;color:#5eead4}
-#hd p{font-size:9px;color:#3e506a;margin-top:2px;letter-spacing:.3px}
-#zc{position:absolute;bottom:16px;right:16px;display:flex;flex-direction:column;gap:5px;pointer-events:auto}
-#zc button{width:34px;height:34px;border-radius:9px;border:1px solid rgba(94,234,212,.12);background:rgba(8,14,30,.75);backdrop-filter:blur(10px);color:#5eead4;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Space Grotesk',sans-serif}
-#zc button:hover{background:rgba(94,234,212,.1);border-color:rgba(94,234,212,.3)}
+#hd{position:absolute;top:20px;left:24px;pointer-events:auto}
+#hd h1{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:800;color:#f4f7fb;letter-spacing:-.6px;line-height:1;text-shadow:0 0 30px rgba(94,234,212,.25)}
+#hd h1 em{font-style:normal;background:linear-gradient(120deg,#5eead4,#7de8d8,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#hd p{font-size:12.5px;color:#8ba0bd;margin-top:6px;letter-spacing:.5px;font-weight:500}
+#zc{position:absolute;bottom:18px;right:18px;display:flex;flex-direction:column;gap:6px;pointer-events:auto}
+#zc button{width:36px;height:36px;border-radius:10px;border:1px solid rgba(94,234,212,.15);background:rgba(255,255,255,.04);backdrop-filter:blur(14px);color:#7de8d8;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Space Grotesk',sans-serif;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+#zc button:hover{background:rgba(94,234,212,.12);border-color:rgba(94,234,212,.35)}
 #zc button:active{transform:scale(.9)}
-#hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:8.5px;color:#2a3c55;letter-spacing:1.3px;text-transform:uppercase;animation:br 3s ease-in-out infinite;pointer-events:none}
-@keyframes br{0%,100%{opacity:.25}50%{opacity:.65}}
-
-@media(max-width:640px){
-  .nc{padding:10px 12px 9px}.nt{font-size:10.5px}.nd-desc{font-size:9px}.tg span{font-size:7px}
-  #fb-title{font-size:18px}#fb-body{font-size:13px;padding:8px 20px 28px}#fb-header{padding:0 20px 0}
-}
+#hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-size:9px;color:#3a4c68;letter-spacing:1.3px;text-transform:uppercase;animation:br 3s ease-in-out infinite;pointer-events:none}
+@keyframes br{0%,100%{opacity:.3}50%{opacity:.7}}
+@media(max-width:640px){#hd h1{font-size:22px}#hd p{font-size:10.5px}.nc{padding:11px 13px 10px}.nt{font-size:11px}.nd-desc{font-size:9px}.tg span{font-size:7px}#fb-title{font-size:18px}#fb-body{font-size:12.5px;padding:8px 18px 26px}#fb-header{padding:0 18px}.yl{font-size:10px}}
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
-<canvas id="conn"></canvas>
+<canvas id="bg"></canvas><canvas id="conn"></canvas>
 <div id="viewport"><div id="stage"></div></div>
-
-<div id="flip-overlay">
-  <div id="flip-backdrop"></div>
-  <div id="flip-container">
-    <div class="flip-face" id="flip-front"></div>
-    <div class="flip-face" id="flip-back">
-      <div id="fb-close"><button onclick="closeFlip()">&#10005;</button></div>
-      <div id="fb-header"><span id="fb-icon"></span><div id="fb-title"></div><div id="fb-period"></div></div>
-      <div id="fb-body"></div>
-    </div>
-  </div>
-</div>
-
-<div id="hud">
-  <div id="hd"><h1>ANTONIO M. <em>DE PALMA</em></h1><p>Career Timeline &bull; Click card to explore &bull; Drag / Shift+Drag</p></div>
-  <div id="zc">
-    <button onclick="zoomBtn(1)" title="Zoom in">+</button>
-    <button onclick="zoomBtn(-1)" title="Zoom out">&minus;</button>
-    <button onclick="resetView()" title="Reset" style="font-size:12px">&#8634;</button>
-  </div>
-  <div id="hint">Drag to orbit &bull; Shift+drag to pan &bull; Scroll to zoom &bull; Click card to flip open</div>
-</div>
-
+<div id="flip-overlay"><div id="flip-backdrop"></div><div id="flip-container"><div class="flip-face" id="flip-front"></div><div class="flip-face" id="flip-back"><div id="fb-close"><button onclick="closeFlip()">&#10005;</button></div><div id="fb-header"><span id="fb-icon"></span><div id="fb-title"></div><div id="fb-period"></div></div><div id="fb-body"></div></div></div></div>
+<div id="hud"><div id="hd"><h1>ANTONIO M. <em>DE PALMA</em></h1><p>Il mio universo professionale &bull; Tocca una scheda per esplorare</p></div><div id="zc"><button onclick="zoomBtn(1)">+</button><button onclick="zoomBtn(-1)">&minus;</button><button onclick="resetView()" style="font-size:12px">&#8634;</button></div><div id="hint">Trascina per ruotare &bull; Shift+trascina per spostare &bull; Scorri per zoom</div></div>
 <script>
+var LINKEDIN='https://www.linkedin.com/in/tonydepalma3471';
 var N=[
-{id:'identity',icon:'\u{1F30D}',title:'Origins',period:'Born 1971 \u2022 London',
-desc:'British-Italian. London roots, Pratola Serra base. Native English, bilingual Italian.',
-tags:['London','Pratola Serra','Bilingual','Giulia \u{1F3CE}\uFE0F'],
-color:'#94a3b8',w:175,
-back:'<h3>Antonio Michael De Palma</h3><p>Born in <span class="hl">London, UK</span> \u2014 3 April 1971</p><p>Based in <span class="hl">Pratola Serra (AV)</span>, Italy</p><div class="ins"><strong>Dual identity:</strong> Native English speaker raised in London, fully bilingual in Italian. This cultural bridge underpins his entire career in international software localisation.</div><h3>Profile</h3><p>Passionate about technology. Meticulous, structured, methodical \u2014 the same rigour on factory floors as in cloud-synced React apps.</p><p>Drives an <span class="hl">Alfa Romeo Giulia</span> \u{1F3CE}\uFE0F</p><h3>Contact</h3><p>\u{1F4E7} tony.m.depalma@gmail.com<br>\u{1F4F1} (+39) 333 8411624<br>\u{1F4CD} Parco delle Mimose 8, Pratola Serra (AV)</p>'},
+{id:'flags',icon:'',title:'Britannico \u00B7 Italiano',period:'Inglese madrelingua \u2022 Bilingue italiano',
+desc:'Nato a Londra, vivo in Italia. Due culture, due lingue, un\u2019unica identit\u00E0 professionale.',
+tags:['Inglese Madrelingua','Bilingue Italiano','Ponte Culturale'],
+color:'#e0c97f',w:200,isFlags:true,
+back:'<h3>\u{1F1EC}\u{1F1E7} Inglese \u2014 Madrelingua</h3><p>Sono nato e cresciuto a <span class="hl">Londra</span>, formato alla <span class="hl">St Joseph\u2019s Academy di Blackheath</span> fino al 1985. L\u2019inglese non \u00E8 una competenza acquisita: \u00E8 la mia <span class="hl">lingua madre</span>, parlata con fluidit\u00E0 nativa, idioma naturale e istinto culturale.</p><div class="ins"><strong>Vantaggio professionale:</strong> essere madrelingua inglese in un\u2019azienda software italiana non \u00E8 solo un plus comunicativo. Significa redigere documentazione, condurre demo internazionali, gestire relazioni con clienti multinazionali e progettare interfacce bilingue \u2014 tutto senza l\u2019attrito della traduzione.</div><h3>\u{1F1EE}\u{1F1F9} Italiano \u2014 Bilingue Completo</h3><p>Dopo il trasferimento in Irpinia da adolescente, ho raggiunto una <span class="hl">padronanza bilingue completa</span> dell\u2019italiano \u2014 professionale, tecnica e colloquiale. Oltre 35 anni di vita e lavoro in Italia hanno reso questa una vera seconda lingua madre.</p><h3>Il Ponte Culturale</h3><p>Questa doppia identit\u00E0 non \u00E8 solo linguistica. \u00C8 una <span class="hl">fluidit\u00E0 culturale</span> che plasma tutto: come mi rapporto ai clienti internazionali, come progetto interfacce bilingue, come mi muovo tra la concretezza anglosassone e la cultura relazionale italiana del business.</p><div class="ins"><strong>In pratica:</strong> ogni applicazione che costruisco con Claude ha supporto bilingue EN/IT completo \u2014 non tradotto automaticamente, ma scritto nativamente in entrambe le lingue.</div>'},
 
-{id:'education',icon:'\u{1F393}',title:'Education',period:'1985 \u2013 1995',
-desc:'London \u2192 Avellino diploma \u2192 ISVOR FIAT Six Sigma \u2192 Qualification 90/100.',
-tags:['Electrotechnical','ISVOR FIAT','Six Sigma','90/100'],
-color:'#fb923c',w:178,
-back:'<h3>St Joseph\u2019s Academy</h3><p>Blackheath, London (until 1985)</p><h3>ITI \u201CGuido Dorso\u201D \u2014 Avellino (1990)</h3><ul><li>Electrotechnical Expert Diploma \u2014 Industrial Automation</li><li>Grade: 52/60</li></ul><h3>ISVOR FIAT \u2014 Turin (1993)</h3><ul><li>Six Sigma \u2014 statistical production management</li><li>Quality control, pneumatic/hydraulic systems</li><li>Siemens PLC interfacing</li></ul><div class="ins"><strong>Note:</strong> ISVOR FIAT was the elite internal training academy of the FIAT Group. Acceptance indicated high-performer status within the organisation.</div><h3>Professional Qualification (1995)</h3><div class="mt"><span class="v">90/100</span><span class="l">Qualification grade</span></div><h3>Languages</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><div class="mt"><span class="v">\u{1F1EC}\u{1F1E7}</span><span class="l">English \u2014 Native</span></div><div class="mt"><span class="v">\u{1F1EE}\u{1F1F9}</span><span class="l">Italian \u2014 Bilingual</span></div></div>'},
+{id:'identity',icon:'\u{1F30D}',title:'Origini & Identit\u00E0',period:'Nato nel 1971 \u2022 Londra \u2192 Avellino',year:'1971',
+desc:'Nato a Londra. Vivo a Pratola Serra (AV). Appassionato di tecnologia, ossessionato dai dettagli. Guido un\u2019Alfa Romeo Giulia.',
+tags:['Londra','Pratola Serra','Alfa Giulia \u{1F3CE}\uFE0F','Tecnologia'],
+color:'#94a3b8',w:180,
+back:'<h3>Chi Sono</h3><p>Nato a <span class="hl">Londra, UK</span> \u2014 3 aprile 1971</p><p>Vivo a <span class="hl">Pratola Serra (AV)</span>, Italia</p><h3>Profilo Personale</h3><p>Sono appassionato di <span class="hl">tutto ci\u00F2 che riguarda la tecnologia</span>. Porto una particolare attenzione al dettaglio con un approccio professionale e metodico a ogni aspetto della disciplina lavorativa. Unisco capacit\u00E0 comunicative e organizzative a forti doti analitiche e di problem-solving.</p><div class="ins"><strong>La mia passione nascosta:</strong> a livello hobbistico progetto <span class="hl">dispositivi elettronici</span> \u2014 dalla schematica al circuito. \u00C8 il filo che unisce tutto ci\u00F2 che faccio: la curiosit\u00E0 di capire come funzionano le cose smontandole e ricostruendole meglio. La stessa mentalit\u00E0 che applico al codice, ai processi produttivi e ai sistemi.</div><p>Guido un\u2019<span class="hl">Alfa Romeo Giulia</span> \u{1F3CE}\uFE0F \u2014 perch\u00E9 anche l\u2019ingegneria, quando \u00E8 fatta bene, \u00E8 una forma d\u2019arte.</p><h3>Contatti</h3><p>\u{1F4E7} tony.m.depalma@gmail.com<br>\u{1F4F1} (+39) 333 8411624<br>\u{1F4CD} Parco delle Mimose 8, Pratola Serra (AV)</p><a class="li" href="'+LINKEDIN+'" target="_blank" rel="noopener">\u{1F517} Il mio profilo LinkedIn</a><div class="photo-slot"><span class="em">\u{1F4F7}</span><span>Spazio per la tua foto LinkedIn<br>(inserisci l\u2019URL dell\u2019immagine nel codice)</span></div>'},
 
-{id:'fiat',icon:'\u{1F3ED}',title:'FMA / FIAT',period:'1994 \u2013 2001',
-desc:'Team Leader automotive. Six Sigma SPC, training. PMQ Award \u2014 \u20AC180k/yr saved per plant.',
-tags:['Six Sigma','SPC','PMQ Award','\u20AC180k/yr','Stellantis'],
-color:'#f87171',w:185,
-back:'<h3>Team Leader \u2014 FMA S.p.A.</h3><p>FCA Group \u2192 Stellantis \u2022 Pratola Serra (AV) \u2022 7 years</p><div class="ins"><strong>Context:</strong> FMA Pratola Serra is a major Stellantis powertrain plant. High-volume, high-stakes production where quality failures cost real money.</div><h3>Quality &amp; Production</h3><ul><li>Continuous quality analysis via <span class="hl">Six Sigma / SPC</span></li><li>On-the-job training for operators &amp; prototype teams</li><li>Developed continuous product &amp; process improvement methods</li></ul><h3>\u{1F3C6} 1999 PMQ Award</h3><p>Winner \u2014 Best Proposal for Quality Improvement:</p><p><em>\u201CHW/SW control of cylinder heads in work stations\u201D</em></p><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"><div class="mt"><span class="v">\u20AC180k+</span><span class="l">Saved/yr/plant</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Line stops</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Waste</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Restart time</span></div></div><div class="ins" style="margin-top:12px"><strong>Impact:</strong> A full HW/SW system eliminating mechanical transport failures and slashing restart times across production lines.</div>'},
+{id:'education',icon:'\u{1F393}',title:'Formazione',period:'1985 \u2013 1995',year:'1985',
+desc:'St Joseph\u2019s Academy Londra \u2192 ITI Guido Dorso Avellino \u2192 ISVOR FIAT Torino \u2192 Abilitazione professionale 90/100.',
+tags:['Londra','Perito Elettrotecnico','ISVOR FIAT','Six Sigma','90/100'],
+color:'#fb923c',w:188,
+back:'<h3>St Joseph\u2019s Academy</h3><p>Blackheath, <span class="hl">Londra</span> \u2014 istruzione primaria e secondaria fino al 1985. La scuola in lingua inglese che ha formato le fondamenta della mia madrelingua.</p><h3>ITI \u201CGuido Dorso\u201D \u2014 Avellino (1990)</h3><ul><li><span class="hl">Diploma di Perito Elettrotecnico</span> \u2014 corso sperimentale in Automazione Industriale</li><li>Voto: <span class="hl">52/60</span></li></ul><h3>ISVOR FIAT \u2014 Torino (1993)</h3><div class="ins"><strong>Nota:</strong> ISVOR FIAT era l\u2019accademia di formazione interna d\u2019\u00E9lite del Gruppo FIAT. Essere selezionati indicava lo status di alto potenziale nell\u2019organizzazione.</div><ul><li><span class="hl">Six Sigma</span> \u2014 Analisi e gestione statistica dei processi produttivi</li><li>Controllo qualit\u00E0</li><li>Sistemi pneumatici/idraulici</li><li>Interfacciamento con sistemi <span class="hl">PLC Siemens</span></li></ul><h3>Abilitazione Professionale (1995)</h3><p>Conseguimento del diritto all\u2019esercizio della professione.</p><div class="mt"><span class="v">90/100</span><span class="l">Voto abilitazione</span></div>'},
 
-{id:'cie',icon:'\u{1F4A1}',title:'Public Lighting',period:'2001 \u2013 2006',
-desc:'Technical Manager. Electrical design, TPM, accounting, energy-saving for municipalities.',
-tags:['Electrical Design','TPM','Energy Saving','Finance'],
-color:'#fbbf24',w:182,
-back:'<h3>Technical Manager \u2014 CIE s.a.s</h3><p>Provinces of Avellino &amp; Benevento</p><div class="ins"><strong>Unusual breadth:</strong> Financial management + electrical engineering + sustainability consulting in a single position.</div><h3>Finance</h3><ul><li>Tax documentation, financial planning, cash-flow supervision</li><li>Computerised accounting &amp; billing optimisation</li><li>Regulatory compliance with employment consultants</li></ul><h3>Projects</h3><ul><li>End-to-end <span class="hl">public lighting &amp; electrical design</span></li><li><span class="hl">TPM</span> (Total Productive Maintenance) methodology</li><li><span class="hl">Energy-saving programmes</span> for municipalities \u2014 reduced light pollution, optimised consumption</li></ul><div class="ins"><strong>Ahead of the curve:</strong> Applied sustainability and energy-saving solutions years before ESG became a boardroom priority.</div>'},
+{id:'fiat',icon:'\u{1F3ED}',title:'FMA / FIAT (Stellantis)',period:'1994 \u2013 2001',year:'1994',
+desc:'Team Leader nella produzione automotive. Six Sigma SPC, formazione operatori. Premio PMQ 1999 \u2014 oltre \u20AC180k/anno risparmiati per stabilimento.',
+tags:['Six Sigma','SPC','Premio PMQ','\u20AC180k/anno','Stellantis'],
+color:'#f87171',w:192,
+back:'<h3>Team Leader \u2014 FMA S.p.A.</h3><p>Gruppo FCA \u2192 Stellantis \u2022 Pratola Serra (AV) \u2022 <span class="hl">7 anni</span></p><div class="ins"><strong>Contesto:</strong> FMA Pratola Serra \u00E8 un importante stabilimento powertrain Stellantis. Produzione ad alto volume e alta posta in gioco, dove i difetti di qualit\u00E0 costano denaro reale.</div><h3>Qualit\u00E0 & Produzione</h3><ul><li>Analisi continua della qualit\u00E0 del ciclo produttivo con criteri <span class="hl">Six Sigma / SPC</span></li><li><span class="hl">Formazione e preparazione</span> di operatori \u201Con the job\u201D per lo sviluppo delle competenze in produzione e sui nuovi prototipi</li><li>Sviluppo di metodi per il <span class="hl">miglioramento continuo</span> del prodotto e dei processi</li></ul><h3>\u{1F3C6} Premio PMQ 1999</h3><p>Vincitore \u2014 Migliore Proposta di Miglioramento Qualit\u00E0:</p><p><em>\u201CPer l\u2019implementazione di un corretto controllo HW/SW delle teste cilindri nelle work station\u201D</em></p><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><div class="mt"><span class="v">\u20AC180k+</span><span class="l">Risparmiati/anno</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Fermi linea</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Scarti</span></div><div class="mt"><span class="v">\u2193</span><span class="l">Tempi riavvio</span></div></div>'},
 
-{id:'wind',icon:'\u{1F32C}\uFE0F',title:'Wind Farm & 3D',period:'2006 \u2013 2007',
-desc:'3D renderings for wind farm environmental impact. Google Earth pipeline for investors.',
-tags:['3D Modelling','Google Earth','Rendering','EIA'],
-color:'#38bdf8',w:175,
-back:'<h3>Wind Farm Assessments \u2014 DMP Associates</h3><p>Engineering &amp; Architecture studio, Avellino</p><div class="ins"><strong>Bridge role:</strong> 3D visualisation meets environmental assessment \u2014 making complex spatial data accessible to non-technical stakeholders.</div><ul><li>Virtual renderings &amp; animations for <span class="hl">environmental impact analysis</span></li><li><span class="hl">Micro-siting studies</span> via 3D modelling tools</li><li>Built <span class="hl">Google Earth sharing pipeline</span> for partners, investors and municipal planners</li></ul><div style="margin-top:12px"><span class="tag">3D Modelling</span><span class="tag">Google Earth</span><span class="tag">Environmental Impact</span><span class="tag">Micro-siting</span><span class="tag">Rendering</span></div>'},
+{id:'cie',icon:'\u{1F4A1}',title:'Illuminazione Pubblica',period:'2001 \u2013 2006',year:'2001',
+desc:'Responsabile Tecnico presso CIE s.a.s. Amministrazione, contabilit\u00E0, progettazione elettrica, TPM, risparmio energetico per i comuni.',
+tags:['Progettazione Elettrica','TPM','Risparmio Energetico','Contabilit\u00E0'],
+color:'#fbbf24',w:195,
+back:'<h3>Responsabile Tecnico \u2014 CIE s.a.s</h3><p>Operante sull\u2019intero territorio delle province di <span class="hl">Avellino e Benevento</span></p><div class="ins"><strong>Ampiezza inusuale:</strong> questo ruolo univa gestione amministrativa/contabile, project management tecnico e consulenza di sostenibilit\u00E0 in un\u2019unica posizione \u2014 dalla documentazione fiscale ai modelli energetici dell\u2019illuminazione stradale.</div><h3>Amministrazione & Contabilit\u00E0</h3><ul><li>Redazione e gestione della <span class="hl">documentazione fiscale</span>, pianificazione finanziaria</li><li>Responsabile dell\u2019<span class="hl">informatizzazione dei processi contabili</span></li><li>Gestione dei rapporti con i <span class="hl">consulenti del lavoro</span></li></ul><h3>Pianificazione & Gestione Progetti</h3><ul><li>Coordinamento di progetti complessi di <span class="hl">illuminazione pubblica e progettazione elettrica</span></li><li>Progetti completati <span class="hl">nei tempi e nei costi</span></li><li>Piani di manutenzione con approccio <span class="hl">TPM (Total Productive Maintenance)</span></li><li>Progetti di <span class="hl">risparmio energetico</span> per i comuni</li></ul><div class="ins"><strong>In anticipo sui tempi:</strong> ho applicato soluzioni \u201CEnergy Saving\u201D anni prima che l\u2019ESG diventasse un tema da consiglio d\u2019amministrazione.</div>'},
 
-{id:'acca',icon:'\u{1F3E2}',title:'ACCA Software',period:'2007 \u2013 Present',
-desc:'Team Leader Localisation. 17+ years leading multilingual delivery for BIM/CAD products.',
-tags:['Localisation','Jira','BIM/CAD','AI Workflows','KPIs'],
-color:'#5eead4',w:188,
-back:'<h3>Team Leader \u2014 Software Localisation</h3><p>ACCA Software S.p.A. \u2014 Bagnoli Irpino (AV)</p><div class="ins"><strong>17+ years</strong> \u2014 a testament to depth. This tenure spans from desktop-only CAD to cloud-native BIM platforms.</div><h3>Scope</h3><ul><li>Full ownership of localisation pipeline across all product lines</li><li>Single point of contact for all localisation bugs via <span class="hl">Jira, Mantis, BugZilla</span></li><li>Software testing plans; embedded in dev sprints</li><li>International trade fair demos &amp; training \u2014 <span class="hl">delivered in English</span></li><li>Client management with multinational partners</li></ul><h3>Innovation</h3><ul><li><span class="hl">AI-supported workflows</span> across processes</li><li>Built <span class="hl">KPI management tools</span></li><li>Cross-team contributor beyond role scope</li></ul><div class="ins"><strong>Key insight:</strong> Not a translation role. A technical leadership position bridging development, QA, client services, and international business development.</div>'},
+{id:'wind',icon:'\u{1F32C}\uFE0F',title:'Parchi Eolici & 3D',period:'2006 \u2013 2007',year:'2006',
+desc:'DMP Associates \u2014 rendering 3D e animazioni per l\u2019impatto ambientale dei parchi eolici. Pipeline di condivisione via Google Earth per gli investitori.',
+tags:['Modellazione 3D','Google Earth','Rendering','Micro-siting'],
+color:'#38bdf8',w:182,
+back:'<h3>Valutazioni Parchi Eolici \u2014 DMP Associates</h3><p>Studio di Ingegneria e Architettura, <span class="hl">Avellino</span></p><div class="ins"><strong>Ruolo di ponte:</strong> unire competenze di visualizzazione 3D e ingegneria ambientale \u2014 rendendo dati spaziali complessi accessibili a stakeholder non tecnici come investitori e pianificatori comunali.</div><ul><li>Produzione di <span class="hl">rendering virtuali e animazioni</span> per l\u2019analisi dell\u2019impatto ambientale</li><li>Studi di <span class="hl">microlocalizzazione (micro-siting)</span> con strumenti di modellazione 3D</li><li>Pipeline di collaborazione basata su <span class="hl">Google Earth\u00A9</span> per partner, investitori e colleghi</li></ul>'},
 
-{id:'canvas',icon:'\u{1F916}',title:'AI Builder & Claude',period:'2024 \u2013 Present',
-desc:'Building production-grade React apps with real-time sync, SVG visualisation, bilingual UIs.',
-tags:['React','Redis','SVG','Bilingual','Claude AI'],
-color:'#a78bfa',w:188,
-back:'<h3>Building with Claude \u2014 AI-Powered Product Development</h3><div class="ins"><strong>Not prompting \u2014 building.</strong> Antonio architects full applications, debugs edge cases, and ships features with senior-developer precision.</div><h3>Strategic Business Canvas App</h3><ul><li>Sophisticated <span class="hl">React single-file application</span> \u2014 full Business Model Canvas</li><li><span class="hl">Real-time cloud sync via Redis</span>, multi-user collaborative</li><li>Full <span class="hl">bilingual EN/IT</span> interface</li><li><span class="hl">Story Tracer</span> \u2022 <span class="hl">Connection Paths</span> (SVG B\u00e9zier) \u2022 <span class="hl">Connection Insights</span></li><li>Setup Wizard \u2022 Report Generator \u2022 Market Canvas Switcher</li></ul><h3>Working Style with AI</h3><ul><li><span class="hl">Precise, directive feedback</span> \u2014 catches misreads fast</li><li>Surgical code changes, <span class="hl">Babel JSX verification</span></li></ul><div class="ins"><strong>The gap</strong> between \u201Cuses AI\u201D and \u201Cbuilds production software with AI\u201D is enormous. Antonio is firmly in the second category.</div>'},
+{id:'acca',icon:'\u{1F3E2}',title:'ACCA Software',period:'2007 \u2013 Oggi',year:'2007',
+desc:'Team Leader Localizzazione Software. Oltre 17 anni alla guida della delivery multilingue per la principale software house BIM/CAD italiana.',
+tags:['Localizzazione','usBIM','Edificius','Jira','Demo Internazionali','AI'],
+color:'#5eead4',w:200,
+back:'<h3>Team Leader \u2014 Localizzazione Software</h3><p>ACCA Software S.p.A. \u2014 Bagnoli Irpino, Avellino \u2014 <span class="hl">Da settembre 2007</span></p><div class="ins"><strong>Oltre 17 anni</strong> nello stesso ruolo \u2014 una testimonianza di profondit\u00E0, non di inerzia. Questo percorso attraversa l\u2019intero arco dai tool CAD desktop alle piattaforme BIM cloud-native.</div><h3>Le Soluzioni Software che Localizzo e Padroneggio</h3><ul><li><span class="hl">Edificius</span> \u2014 il software BIM di progettazione architettonica di punta ACCA: modellazione architettonica, rendering real-time integrato, progettazione edilizia completa</li><li><span class="hl">usBIM</span> \u2014 la piattaforma cloud collaborativa: gestione documentale BIM, condivisione modelli, coordinamento multi-utente</li><li><span class="hl">Edificius-MEP</span>, progettazione impianti, e l\u2019intera suite tecnica CAD/BIM ACCA</li><li>Conoscenza approfondita di <span class="hl">ACCA software, sia desktop che cloud</span></li></ul><h3>Demo ai Clienti Internazionali di Primo Piano</h3><ul><li>Ideazione e conduzione di <span class="hl">demo dal vivo</span> a clienti internazionali \u2014 in inglese, con autorevolezza da madrelingua</li><li>Presentazioni software a <span class="hl">fiere internazionali</span> e aziende globali</li><li>Sinergie con le <span class="hl">principali multinazionali</span> del settore</li></ul><h3>Relazioni con le Grandi Aziende di Infrastrutture</h3><div class="ins"><strong>Relazioni strategiche:</strong> gestione di rapporti importanti con <span class="hl">aziende leader nel settore delle infrastrutture</span>. Costruire fiducia con questi partner richiede competenza tecnica, comunicazione trasparente e affidabilit\u00E0 costante.</div><h3>Creazione Contenuti & Formazione Globale</h3><ul><li><span class="hl">Creazione di contenuti</span> tecnici, tutorial e materiali formativi</li><li><span class="hl">Formazione di professionisti a livello globale</span> \u2014 programmi di training e demo in inglese</li><li>Progettazione di <span class="hl">piani di \u201Csoftware testing\u201D</span> dettagliati</li></ul><h3>Gestione & Innovazione</h3><ul><li>Punto di contatto in ottica <span class="hl">\u201CClient Oriented\u201D</span></li><li>Bug tracking con <span class="hl">Jira, Mantis, BugZilla</span></li><li>Contributo alla creazione di strumenti per il <span class="hl">monitoraggio dei KPI</span></li><li>Implementazione di <span class="hl">processi supportati da workflow AI</span></li></ul>'},
 
-{id:'skills',icon:'\u2699\uFE0F',title:'Technical Stack',period:'30+ years',
-desc:'PLC to React. Localisation, BIM/CAD, 3D, web, industrial automation, AI.',
-tags:['Lingobit','Archicad','SketchUp','WordPress','PLC','AI'],
-color:'#22d3ee',w:180,
-back:'<h3>Three Decades of Technical Range</h3><div class="ins"><strong>Rare profile:</strong> Fluent across industrial automation, architectural CAD, software localisation, web development, and AI-assisted app building.</div><ul><li><span class="hl">Localisation:</span> Lingobit, Language Manager, XML, JS resources</li><li><span class="hl">BIM/CAD:</span> Archicad, Edificius, SketchUp, electrical CAD</li><li><span class="hl">3D:</span> Vue 8 Xstream, Google Earth integrations</li><li><span class="hl">Web:</span> WordPress, HTML, React</li><li><span class="hl">Office:</span> Advanced PowerPoint &amp; Excel</li><li><span class="hl">Tracking:</span> Jira, Mantis, BugZilla</li><li><span class="hl">Industrial:</span> PLC programming, CNC, Siemens</li></ul><h3>AI Proficiency</h3><p>Building full-stack apps with Claude: React, Redis, SVG data viz, complex state management.</p><div style="margin-top:12px"><span class="tag">React</span><span class="tag">Redis</span><span class="tag">BIM</span><span class="tag">CAD</span><span class="tag">WordPress</span><span class="tag">PLC</span><span class="tag">AI</span><span class="tag">Jira</span></div>'},
+{id:'canvas',icon:'\u{1F916}',title:'Sviluppo AI & Claude',period:'2024 \u2013 Oggi',year:'2024',
+desc:'Costruisco applicazioni React di livello produzione con sync real-time, visualizzazione SVG e interfacce bilingue \u2014 in prima persona con Claude.',
+tags:['React','Redis','SVG','Bilingue','Claude AI','Real-Time'],
+color:'#a78bfa',w:195,
+back:'<h3>Costruire con Claude \u2014 Sviluppo Prodotti AI</h3><div class="ins"><strong>Non prompt \u2014 costruzione.</strong> Non uso l\u2019AI per scrivere email. Progetto applicazioni complete, faccio debug dei casi limite e rilascio funzionalit\u00E0 con la precisione di uno sviluppatore senior.</div><h3>Strategic Business Canvas App</h3><ul><li>Sofisticata <span class="hl">applicazione React single-file</span> \u2014 uno strumento completo di Business Model Canvas</li><li><span class="hl">Sync cloud real-time via Redis</span>, architettura collaborativa multi-utente</li><li>Interfaccia <span class="hl">bilingue EN/IT</span> \u2014 nativamente scritta in entrambe le lingue</li><li><span class="hl">Story Tracer</span> \u2014 tracciamento narrativo tra le card</li><li><span class="hl">Connection Paths</span> \u2014 overlay SVG a curve B\u00E9zier che mostrano le relazioni</li><li><span class="hl">Connection Insights</span> \u2014 ranking per co-occorrenza pesata</li><li>Wizard con traduzione italiana, Report Generator, Market Canvas Switcher</li><li>Individuato e risolto un <span class="hl">bug critico di perdita dati</span> Redis</li></ul><h3>Il Mio Modo di Lavorare con l\u2019AI</h3><ul><li><span class="hl">Feedback preciso e direttivo</span> \u2014 individuo subito le interpretazioni errate</li><li><span class="hl">Modifiche chirurgiche</span> alle riscritture ampie</li><li>Verifica col <span class="hl">parser Babel JSX</span> prima della consegna</li></ul>'},
 
-{id:'leadership',icon:'\u{1F3AF}',title:'Leadership DNA',period:'Entire career',
-desc:'Team leadership across automotive, infrastructure, software. KPI design, AI process workflows.',
-tags:['Team Lead','KPIs','AI Process','Stakeholders'],
-color:'#e879f9',w:178,
-back:'<h3>Leadership Across Three Industries</h3><div class="ins"><strong>Pattern:</strong> In every role \u2014 factory, municipality, software \u2014 Antonio gravitates to process improvement and expands scope voluntarily.</div><ul><li>Team leadership across manufacturing, public services, and software</li><li><span class="hl">KPI tools</span> \u2014 created, not just used</li><li>International client relationship management</li><li>Structured management reporting on milestones</li><li><span class="hl">AI-driven process workflows</span></li></ul><h3>Work DNA</h3><ul><li><span class="hl">Precise &amp; directive</span> \u2014 spots misalignment fast</li><li><span class="hl">Autonomous</span> \u2014 manages complex loads independently</li><li><span class="hl">Client-first</span> \u2014 every interaction demonstrates value</li><li><span class="hl">Improvement-obsessed</span> \u2014 always optimising</li></ul>'}
+{id:'skills',icon:'\u2699\uFE0F',title:'Stack Tecnico',period:'30+ anni di competenze',
+desc:'Dai PLC a React. Tool di localizzazione, BIM/CAD, ambienti 3D, web, automazione industriale, strumenti AI.',
+tags:['Lingobit','Archicad','SketchUp','WordPress','PLC','Excel','AI'],
+color:'#22d3ee',w:190,
+back:'<h3>Tre Decenni di Ampiezza Tecnica</h3><div class="ins"><strong>Profilo raro:</strong> fluente tra automazione industriale, CAD architettonico, localizzazione software, sviluppo web, animazione 3D e sviluppo app assistito da AI.</div><h3>Ambienti di Localizzazione</h3><ul><li><span class="hl">Lingobit, Language Manager</span></li><li>Editing manuale di <span class="hl">risorse linguistiche in JavaScript</span></li><li>Strumenti di <span class="hl">editing XML</span></li></ul><h3>BIM, CAD & 3D</h3><ul><li>Archicad, Edificius (BIM), CAD elettrico</li><li>ACCA software desktop e cloud (usBIM)</li><li>SketchUp avanzato, Vue 8 Xstream</li></ul><h3>Web & Office</h3><ul><li>WordPress, HTML, PowerPoint ed Excel avanzati</li></ul><h3>Bug Tracking & QA</h3><ul><li>Jira, Mantis, BugZilla</li></ul><h3>Industriale</h3><ul><li>Logica PLC, CNC, Windows OS</li></ul><h3>AI</h3><ul><li>Uso avanzato di diversi strumenti AI</li><li>Costruzione app full-stack con Claude</li></ul>'},
+
+{id:'leadership',icon:'\u{1F3AF}',title:'DNA di Leadership',period:'Lungo tutta la carriera',
+desc:'Leadership di team tra automotive, infrastrutture e software. Progettazione KPI, comunicazione con gli stakeholder, workflow AI.',
+tags:['Team Lead','KPI','Workflow AI','Stakeholder','Cross-Team'],
+color:'#e879f9',w:188,
+back:'<h3>Leadership in Tre Settori</h3><div class="ins"><strong>Il pattern:</strong> in ogni ruolo \u2014 dalla fabbrica alle infrastrutture comunali al software \u2014 gravito verso il miglioramento dei processi ed espando volontariamente il mio raggio d\u2019azione.</div><ul><li>Team leadership nella <span class="hl">produzione (Stellantis)</span>, nei <span class="hl">servizi pubblici</span> e nel <span class="hl">software</span></li><li><span class="hl">Progettazione KPI</span> \u2014 creazione, non solo uso</li><li>Relazioni con <span class="hl">multinazionali internazionali</span></li><li>Comunicazione strutturata con il management</li><li>Implementazione di <span class="hl">workflow AI</span></li></ul>'},
+
+{id:'attitude',icon:'\u{1F4AA}',title:'Attitudine & Valori',period:'Il sistema operativo dietro la carriera',
+desc:'Orientato ai risultati. Ossessionato dai dettagli. Autonomo ma collaborativo. Miglioramento continuo come stile di vita, non slogan.',
+tags:['Risultati','Dettaglio','Proattivo','Autonomo','Metodico'],
+color:'#34d399',w:198,
+back:'<h3>Il Mio DNA Professionale Orientato ai Risultati</h3><div class="ins"><strong>Principio fondante:</strong> non mi limito a completare i compiti \u2014 ottimizzo i processi, elimino le inefficienze e costruisco strumenti per rendere l\u2019iterazione successiva pi\u00F9 veloce e migliore.</div><h3>Attenzione al Dettaglio</h3><p>Particolare attenzione al dettaglio con approccio professionale e metodico. Non uno slogan da CV \u2014 si manifesta nelle misurazioni Six Sigma, nel QA di localizzazione al pixel, nel pretendere la verifica col parser Babel JSX prima di accettare il codice.</p><h3>Autonomia & Struttura</h3><p>Ho affinato la capacit\u00E0 di gestire i compiti in autonomia. Non aspetto direttive \u2014 prendo l\u2019iniziativa.</p><h3>Proattivo & Flessibile</h3><ul><li>Mi sono spesso fatto carico di compiti <span class="hl">fuori dal mio ruolo</span></li><li>Dimostro <span class="hl">grande flessibilit\u00E0 e disponibilit\u00E0</span></li></ul><h3>La Passione che Alimenta Tutto</h3><div class="ins"><strong>A livello hobbistico progetto dispositivi elettronici.</strong> La stessa mente che progetta un circuito ottimizza una linea di produzione, fa il debug di un\u2019app React, o affina un processo aziendale.</div><h3>Miglioramento Continuo</h3><p>Impegnato nel miglioramento continuo, personale e professionale. Dedico tempo alla formazione costante per restare aggiornato.</p><div class="ins"><strong>Il filo conduttore:</strong> dai \u20AC180k/anno risparmiati alla FIAT, alle innovazioni di risparmio energetico alla CIE, ai workflow AI in ACCA, fino a costruire app React di produzione con Claude \u2014 la costante \u00E8 qualcuno che migliora <em>il modo</em> in cui il lavoro viene fatto.</div>'}
 ];
 
+// Layout: flags high & solo, timeline row with clear gap, cross-cutting below with clear gap
 var POS=[
-  {x:-520,y:-20,z:30},{x:-360,y:-65,z:-20},{x:-180,y:-15,z:25},
-  {x:0,y:-55,z:-15},{x:180,y:-10,z:20},{x:360,y:-50,z:-25},
-  {x:540,y:-5,z:15},{x:-80,y:145,z:10},{x:180,y:150,z:-10}
+  {x:0,y:-290,z:0},        // 0 flags (top center, well above timeline)
+  {x:-540,y:-25,z:20},     // 1 identity
+  {x:-360,y:-70,z:-15},    // 2 education
+  {x:-180,y:-15,z:20},     // 3 fiat
+  {x:0,y:-65,z:-15},       // 4 cie
+  {x:180,y:-10,z:18},      // 5 wind
+  {x:360,y:-55,z:-18},     // 6 acca
+  {x:540,y:-20,z:12},      // 7 canvas
+  {x:-200,y:230,z:8},      // 8 skills
+  {x:20,y:235,z:-8},       // 9 leadership
+  {x:260,y:230,z:5}        // 10 attitude
 ];
+
+// Timeline year markers positioned along horizontal at y=95, aligned with timeline card x's
+var TIMELINE_INDICES=[1,2,3,4,5,6,7]; // which N entries have a year node
 
 var CONN=[
-  [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],
-  [2,7],[3,7],[4,7],[5,7],[6,7],
-  [2,8],[3,8],[5,8],[6,8],
-  [0,2],[1,2]
+  [0,1],[0,2],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],
+  [3,8],[4,8],[5,8],[6,8],[7,8],[3,9],[4,9],[6,9],[7,9],[6,10],[7,10],[9,10],[1,3],[2,3]
 ];
 
 // ═══ COSMIC BG ═══
-var bgC=document.getElementById('bg'),bgX=bgC.getContext('2d');
-var bS=[],neb=[],dP=[];
-function initBg(){
-  bgC.width=innerWidth;bgC.height=innerHeight;var W=bgC.width,H=bgC.height;
-  bS=[];for(var i=0;i<450;i++)bS.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.15,a:Math.random()*.45+.08,sp:Math.random()*.0005+.0001,ph:Math.random()*6.28});
-  neb=[];for(var j=0;j<4;j++)neb.push({x:Math.random()*W,y:Math.random()*H,rx:100+Math.random()*180,ry:70+Math.random()*130,h:170+Math.random()*50,a:.01+Math.random()*.012,sp:.0002+Math.random()*.0002,ph:Math.random()*6.28});
-  dP=[];for(var k=0;k<50;k++)dP.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.1,r:Math.random()*1.5+.3,a:Math.random()*.2+.04,h:170+Math.random()*35});
-}
+var bgC=document.getElementById('bg'),bgX=bgC.getContext('2d');var bS=[],neb=[],dP=[];
+function initBg(){bgC.width=innerWidth;bgC.height=innerHeight;var W=bgC.width,H=bgC.height;bS=[];for(var i=0;i<450;i++)bS.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.15,a:Math.random()*.45+.08,sp:Math.random()*.0005+.0001,ph:Math.random()*6.28});neb=[];for(var j=0;j<4;j++)neb.push({x:Math.random()*W,y:Math.random()*H,rx:100+Math.random()*180,ry:70+Math.random()*130,h:170+Math.random()*50,a:.01+Math.random()*.012,sp:.0002+Math.random()*.0002,ph:Math.random()*6.28});dP=[];for(var k=0;k<50;k++)dP.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.1,r:Math.random()*1.5+.3,a:Math.random()*.2+.04,h:170+Math.random()*35})}
 initBg();
-function drawBg(t){
-  var W=bgC.width,H=bgC.height;bgX.fillStyle='#03050d';bgX.fillRect(0,0,W,H);
-  for(var j=0;j<neb.length;j++){var nb=neb[j];var p=.7+.3*Math.sin(t*nb.sp*500+nb.ph);var g=bgX.createRadialGradient(nb.x,nb.y,0,nb.x,nb.y,nb.rx*p);g.addColorStop(0,'hsla('+nb.h+',55%,45%,'+nb.a*p+')');g.addColorStop(.5,'hsla('+nb.h+',45%,25%,'+nb.a*p*.3+')');g.addColorStop(1,'transparent');bgX.fillStyle=g;bgX.beginPath();bgX.ellipse(nb.x,nb.y,nb.rx*p,nb.ry*p,0,0,6.28);bgX.fill()}
-  for(var i=0;i<bS.length;i++){var s=bS[i];var f=.4+.6*Math.sin(t*s.sp*700+s.ph);bgX.beginPath();bgX.arc(s.x,s.y,s.r,0,6.28);bgX.fillStyle='rgba(190,210,240,'+s.a*f+')';bgX.fill()}
-  for(var k=0;k<dP.length;k++){var dp=dP[k];dp.x+=dp.vx;dp.y+=dp.vy;if(dp.x<-10)dp.x=W+10;if(dp.x>W+10)dp.x=-10;if(dp.y<-10)dp.y=H+10;if(dp.y>H+10)dp.y=-10;bgX.beginPath();bgX.arc(dp.x,dp.y,dp.r,0,6.28);bgX.fillStyle='hsla('+dp.h+',65%,65%,'+(dp.a*(.6+.4*Math.sin(t*.25+k)))+')';bgX.fill()}
-}
+function drawBg(t){var W=bgC.width,H=bgC.height;bgX.fillStyle='#03050d';bgX.fillRect(0,0,W,H);for(var j=0;j<neb.length;j++){var nb=neb[j];var p=.7+.3*Math.sin(t*nb.sp*500+nb.ph);var g=bgX.createRadialGradient(nb.x,nb.y,0,nb.x,nb.y,nb.rx*p);g.addColorStop(0,'hsla('+nb.h+',55%,45%,'+nb.a*p+')');g.addColorStop(.5,'hsla('+nb.h+',45%,25%,'+nb.a*p*.3+')');g.addColorStop(1,'transparent');bgX.fillStyle=g;bgX.beginPath();bgX.ellipse(nb.x,nb.y,nb.rx*p,nb.ry*p,0,0,6.28);bgX.fill()}for(var i=0;i<bS.length;i++){var s=bS[i];var f=.4+.6*Math.sin(t*s.sp*700+s.ph);bgX.beginPath();bgX.arc(s.x,s.y,s.r,0,6.28);bgX.fillStyle='rgba(190,210,240,'+s.a*f+')';bgX.fill()}for(var k=0;k<dP.length;k++){var dp=dP[k];dp.x+=dp.vx;dp.y+=dp.vy;if(dp.x<-10)dp.x=W+10;if(dp.x>W+10)dp.x=-10;if(dp.y<-10)dp.y=H+10;if(dp.y>H+10)dp.y=-10;bgX.beginPath();bgX.arc(dp.x,dp.y,dp.r,0,6.28);bgX.fillStyle='hsla('+dp.h+',65%,65%,'+(dp.a*(.6+.4*Math.sin(t*.25+k)))+')';bgX.fill()}}
 
 // ═══ BUILD NODES ═══
 var stage=document.getElementById('stage');var nEls={};
-for(var ni=0;ni<N.length;ni++){
-  var n=N[ni];var el=document.createElement('div');el.className='nd';
-  el.style.setProperty('--g',n.color);el.style.setProperty('--gs',n.color+'28');
-  el.style.setProperty('--gf',n.color+'0e');el.style.setProperty('--b',n.color+'22');
-  el.style.setProperty('--bg1',n.color+'0a');el.style.setProperty('--bg2','rgba(6,10,22,.94)');
-  el.style.setProperty('--tb',n.color+'0c');el.style.setProperty('--tbo',n.color+'18');
-  el.style.setProperty('--w',n.w+'px');
-  var th='';for(var ti=0;ti<n.tags.length;ti++)th+='<span>'+n.tags[ti]+'</span>';
-  el.innerHTML='<div class="nc"><span class="ni">'+n.icon+'</span><div class="nt">'+n.title+'</div><div class="np">'+n.period+'</div><div class="nd-desc">'+n.desc+'</div><div class="tg">'+th+'</div><div class="tl-dot"></div></div>';
-  (function(data,elem){
-    elem.addEventListener('click',function(e){e.stopPropagation();openFlip(data,elem)});
-  })(n,el);
-  stage.appendChild(el);nEls[n.id]={el:el};
+function shade(hex){var r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);r=Math.min(255,r+50);g=Math.min(255,g+50);b=Math.min(255,b+50);return'#'+r.toString(16).padStart(2,'0')+g.toString(16).padStart(2,'0')+b.toString(16).padStart(2,'0')}
+
+for(var ni=0;ni<N.length;ni++){var n=N[ni];var el=document.createElement('div');el.className='nd'+(n.isFlags?' flags-card':'');el.style.setProperty('--g',n.color);el.style.setProperty('--gb',shade(n.color));el.style.setProperty('--gs',n.color+'2a');el.style.setProperty('--gf',n.color+'0e');el.style.setProperty('--b',n.color+'2a');el.style.setProperty('--bg1',n.color+'12');el.style.setProperty('--bg2','rgba(8,12,24,.72)');el.style.setProperty('--tb',n.color+'12');el.style.setProperty('--tbo',n.color+'22');el.style.setProperty('--w',n.w+'px');
+var th='';for(var ti=0;ti<n.tags.length;ti++)th+='<span>'+n.tags[ti]+'</span>';
+var iconHtml=n.isFlags?'<span class="flags-glow">\u{1F1EC}\u{1F1E7}\u{1F1EE}\u{1F1F9}</span>':'<span class="ni">'+n.icon+'</span>';
+el.innerHTML='<div class="nc">'+iconHtml+'<div class="nt">'+n.title+'</div><div class="np">'+n.period+'</div><div class="nd-desc">'+n.desc+'</div><div class="tg">'+th+'</div></div>';
+(function(data,elem){elem.addEventListener('click',function(e){e.stopPropagation();openFlip(data,elem)})})(n,el);
+stage.appendChild(el);nEls[n.id]={el:el}}
+
+// ═══ BUILD YEAR MARKERS ═══
+var yEls=[];
+for(var yi=0;yi<TIMELINE_INDICES.length;yi++){
+  var idx=TIMELINE_INDICES[yi];var n=N[idx];
+  var el=document.createElement('div');el.className='ym';
+  el.style.setProperty('--yc',n.color);
+  el.innerHTML='<div class="yd"></div><div class="yl" style="color:'+shade(n.color)+'">'+n.year+'</div>';
+  stage.appendChild(el);
+  yEls.push({el:el,cardIdx:idx});
 }
 
-// ═══ CONNECTIONS ═══
-var cC=document.getElementById('conn'),cX=cC.getContext('2d');
-function szC(){cC.width=innerWidth;cC.height=innerHeight}
-szC();
+var cC=document.getElementById('conn'),cX=cC.getContext('2d');function szC(){cC.width=innerWidth;cC.height=innerHeight}szC();
 
-// ═══ NAVIGATION: orbit + pan + zoom ═══
-var vp=document.getElementById('viewport');
-var rX=-5,rY=0,trX=-5,trY=0;
-var panX=0,panY=0,tpX=0,tpY=0;
-var zm=.82,tzm=.82;
-var drg=false,panning=false,lm={x:0,y:0},vel={x:0,y:0},autoR=true,aT=null;
-
-vp.addEventListener('pointerdown',function(e){
-  drg=true;autoR=false;if(aT)clearTimeout(aT);
-  panning=e.shiftKey||e.button===1||e.button===2;
-  lm={x:e.clientX,y:e.clientY};vel={x:0,y:0};vp.classList.add('drag');
-});
-window.addEventListener('pointermove',function(e){
-  if(!drg)return;var dx=e.clientX-lm.x,dy=e.clientY-lm.y;
-  if(panning||e.shiftKey){tpX+=dx;tpY+=dy}
-  else{trY+=dx*.2;trX-=dy*.2;trX=Math.max(-40,Math.min(40,trX));vel={x:dx*.2,y:-dy*.2}}
-  lm={x:e.clientX,y:e.clientY};
-});
-window.addEventListener('pointerup',function(){drg=false;panning=false;vp.classList.remove('drag');aT=setTimeout(function(){autoR=true},8000)});
+var vp=document.getElementById('viewport');var rX=-5,rY=0,trX=-5,trY=0;var panX=0,panY=0,tpX=0,tpY=0;var zm=.7,tzm=.7;var drg=false,panning=false,lm={x:0,y:0},vel={x:0,y:0},autoR=true,aT=null;
+var DRAG_THRESHOLD=6,moved=false,downPos={x:0,y:0};
+var Y_LIMIT=75;
+vp.addEventListener('pointerdown',function(e){drg=true;moved=false;downPos={x:e.clientX,y:e.clientY};if(aT)clearTimeout(aT);panning=e.shiftKey||e.button===1||e.button===2;lm={x:e.clientX,y:e.clientY};vel={x:0,y:0}});
+window.addEventListener('pointermove',function(e){if(!drg)return;var totDx=e.clientX-downPos.x,totDy=e.clientY-downPos.y;if(!moved){if(Math.abs(totDx)<DRAG_THRESHOLD&&Math.abs(totDy)<DRAG_THRESHOLD)return;moved=true;autoR=false;vp.classList.add('drag')}var dx=e.clientX-lm.x,dy=e.clientY-lm.y;if(panning||e.shiftKey){tpX+=dx;tpY+=dy}else{trY+=dx*.2;trX-=dy*.2;trX=Math.max(-40,Math.min(40,trX));trY=Math.max(-Y_LIMIT,Math.min(Y_LIMIT,trY));vel={x:dx*.2,y:-dy*.2}}lm={x:e.clientX,y:e.clientY}});
+window.addEventListener('pointerup',function(){drg=false;panning=false;vp.classList.remove('drag');if(moved)aT=setTimeout(function(){autoR=true},8000);moved=false});
 vp.addEventListener('contextmenu',function(e){e.preventDefault()});
-vp.addEventListener('wheel',function(e){e.preventDefault();tzm+=e.deltaY<0?.08:-.08;tzm=Math.max(.3,Math.min(2.5,tzm))},{passive:false});
+vp.addEventListener('wheel',function(e){e.preventDefault();tzm+=e.deltaY<0?.08:-.08;tzm=Math.max(.25,Math.min(2.5,tzm))},{passive:false});
+var lpd=0,lpc={x:0,y:0};vp.addEventListener('touchstart',function(e){if(e.touches.length===2){var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;lpd=Math.sqrt(dx*dx+dy*dy);lpc={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2}}},{passive:true});
+vp.addEventListener('touchmove',function(e){if(e.touches.length===2){var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,d=Math.sqrt(dx*dx+dy*dy);tzm+=(d-lpd)*.004;tzm=Math.max(.25,Math.min(2.5,tzm));lpd=d;var cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;tpX+=cx-lpc.x;tpY+=cy-lpc.y;lpc={x:cx,y:cy}}},{passive:true});
+function zoomBtn(d){tzm+=d*.12;tzm=Math.max(.25,Math.min(2.5,tzm))}
+function resetView(){trX=-5;trY=0;tzm=.7;tpX=0;tpY=0;autoR=true}
 
-var lpd=0,lpc={x:0,y:0};
-vp.addEventListener('touchstart',function(e){
-  if(e.touches.length===2){
-    var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-    lpd=Math.sqrt(dx*dx+dy*dy);
-    lpc={x:(e.touches[0].clientX+e.touches[1].clientX)/2,y:(e.touches[0].clientY+e.touches[1].clientY)/2};
-  }
-},{passive:true});
-vp.addEventListener('touchmove',function(e){
-  if(e.touches.length===2){
-    var dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;
-    var d=Math.sqrt(dx*dx+dy*dy);
-    tzm+=(d-lpd)*.004;tzm=Math.max(.3,Math.min(2.5,tzm));lpd=d;
-    var cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;
-    tpX+=cx-lpc.x;tpY+=cy-lpc.y;lpc={x:cx,y:cy};
-  }
-},{passive:true});
-
-function zoomBtn(d){tzm+=d*.12;tzm=Math.max(.3,Math.min(2.5,tzm))}
-function resetView(){trX=-5;trY=0;tzm=.82;tpX=0;tpY=0;autoR=true}
-
-// ═══ FULLSCREEN FLIP ═══
-var flipOv=document.getElementById('flip-overlay');
-var flipCont=document.getElementById('flip-container');
-var flipFront=document.getElementById('flip-front');
-var flipBack=document.getElementById('flip-back');
-var flipOpen=false;
-
-function openFlip(data,srcEl){
-  if(flipOpen)return;flipOpen=true;
-  // Get source card screen position
-  var rect=srcEl.querySelector('.nc').getBoundingClientRect();
-  var sx=rect.left+rect.width/2,sy=rect.top+rect.height/2;
-  var sw=rect.width,sh=rect.height;
-
-  // Target size: nearly fullscreen
-  var tw=Math.min(600,innerWidth*.88),th=Math.min(innerHeight*.85,720);
-  var tx=innerWidth/2,ty=innerHeight/2;
-
-  // Setup front face (clone of card appearance)
-  var th2='';for(var i=0;i<data.tags.length;i++)th2+='<span style="font-size:8px;padding:2px 6px;border-radius:4px;font-weight:500;background:'+data.color+'0c;color:'+data.color+';border:1px solid '+data.color+'18;letter-spacing:.15px;display:inline-block;margin:1px 2px">'+data.tags[i]+'</span>';
-  flipFront.innerHTML='<span style="font-size:17px;display:block;margin-bottom:5px">'+data.icon+'</span><div style="font-family:Space Grotesk,sans-serif;font-size:12px;font-weight:700;color:#e4e8f0;margin-bottom:3px">'+data.title+'</div><div style="font-size:9px;color:'+data.color+';font-weight:600;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase">'+data.period+'</div><div style="font-size:10px;color:#7a8ba8;line-height:1.5">'+data.desc+'</div><div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:7px">'+th2+'</div>';
-
-  // Setup back content
-  document.getElementById('fb-icon').textContent=data.icon;
-  document.getElementById('fb-title').textContent=data.title;
-  document.getElementById('fb-period').textContent=data.period;
-  document.getElementById('fb-body').innerHTML=data.back;
-
-  // Style faces
-  flipFront.style.cssText='width:'+sw+'px;height:'+sh+'px;padding:14px 16px 13px;display:flex;flex-direction:column;justify-content:center;border-color:'+data.color+'22;';
-  flipBack.style.cssText='position:absolute;top:0;left:0;width:'+tw+'px;height:'+th+'px;transform:rotateY(180deg);border-color:'+data.color+'22;';
-
-  // Start position
-  flipCont.style.cssText='left:'+sx+'px;top:'+sy+'px;width:'+sw+'px;height:'+sh+'px;transform:translate(-50%,-50%);transition:none;';
-  flipCont.classList.remove('flipped');
-  flipOv.classList.add('open');
-
-  // Animate to center+fullscreen+flip
-  requestAnimationFrame(function(){requestAnimationFrame(function(){
-    flipCont.style.transition='all .7s cubic-bezier(.4,.0,.15,1)';
-    flipCont.style.left=tx+'px';flipCont.style.top=ty+'px';
-    flipCont.style.width=tw+'px';flipCont.style.height=th+'px';
-    flipCont.classList.add('flipped');
-  })});
-}
-
-function closeFlip(){
-  flipCont.classList.remove('flipped');
-  flipCont.style.opacity='0';
-  setTimeout(function(){flipOv.classList.remove('open');flipCont.style.opacity='1';flipOpen=false},500);
-}
+var flipOv=document.getElementById('flip-overlay');var flipCont=document.getElementById('flip-container');var flipFront=document.getElementById('flip-front');var flipBack=document.getElementById('flip-back');var flipOpen=false;
+function openFlip(data,srcEl){if(flipOpen)return;flipOpen=true;var rect=srcEl.querySelector('.nc').getBoundingClientRect();var sx=rect.left+rect.width/2,sy=rect.top+rect.height/2,sw=rect.width,sh=rect.height;var tw=Math.min(640,innerWidth*.9),th=Math.min(innerHeight*.88,780);var tx=innerWidth/2,ty=innerHeight/2;
+var th2='';for(var i=0;i<data.tags.length;i++)th2+='<span style="font-size:8px;padding:2px 6px;border-radius:4px;font-weight:500;background:'+data.color+'12;color:'+shade(data.color)+';border:1px solid '+data.color+'22;display:inline-block;margin:1px 2px">'+data.tags[i]+'</span>';
+var iconH=data.isFlags?'<span style="font-size:32px;letter-spacing:10px;display:block;margin-bottom:6px">\u{1F1EC}\u{1F1E7}\u{1F1EE}\u{1F1F9}</span>':'<span style="font-size:17px;display:block;margin-bottom:5px">'+data.icon+'</span>';
+flipFront.innerHTML=iconH+'<div style="font-family:Space Grotesk,sans-serif;font-size:12.5px;font-weight:700;color:#f0f3f8;margin-bottom:3px">'+data.title+'</div><div style="font-size:9px;color:'+shade(data.color)+';font-weight:600;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase">'+data.period+'</div><div style="font-size:10px;color:#8a9bb8;line-height:1.5">'+data.desc+'</div><div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:7px">'+th2+'</div>';
+document.getElementById('fb-icon').textContent=data.isFlags?'\u{1F1EC}\u{1F1E7} \u{1F1EE}\u{1F1F9}':data.icon;
+document.getElementById('fb-title').textContent=data.title;document.getElementById('fb-period').textContent=data.period;document.getElementById('fb-body').innerHTML=data.back;
+flipFront.style.cssText='width:'+sw+'px;height:'+sh+'px;padding:15px 17px 14px;display:flex;flex-direction:column;justify-content:center;border-color:'+data.color+'2a;';
+flipBack.style.cssText='position:absolute;top:0;left:0;width:'+tw+'px;height:'+th+'px;transform:rotateY(180deg);border-color:'+data.color+'2a;';
+flipCont.style.cssText='left:'+sx+'px;top:'+sy+'px;width:'+sw+'px;height:'+sh+'px;transform:translate(-50%,-50%);transition:none;';
+flipCont.classList.remove('flipped');flipOv.classList.add('open');
+requestAnimationFrame(function(){requestAnimationFrame(function(){flipCont.style.transition='all .7s cubic-bezier(.4,.0,.15,1)';flipCont.style.left=tx+'px';flipCont.style.top=ty+'px';flipCont.style.width=tw+'px';flipCont.style.height=th+'px';flipCont.classList.add('flipped')})})}
+function closeFlip(){flipCont.classList.remove('flipped');flipCont.style.opacity='0';setTimeout(function(){flipOv.classList.remove('open');flipCont.style.opacity='1';flipOpen=false},500)}
 document.getElementById('flip-backdrop').addEventListener('click',closeFlip);
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&flipOpen)closeFlip()});
 
-// ═══ PROJECTION ═══
-function proj(nx,ny,nz,rx,ry,s,px,py){
-  var ry2=ry*.01745,rx2=rx*.01745;
-  var cr=Math.cos(ry2),sr=Math.sin(ry2),cx=Math.cos(rx2),sx=Math.sin(rx2);
-  var x1=nx*cr-nz*sr,z1=nx*sr+nz*cr;
-  var y2=ny*cx-z1*sx,z2=ny*sx+z1*cx;
-  var p=1200,sc=p/(p+z2);
-  return{sx:innerWidth/2+x1*sc*s+px,sy:innerHeight/2+y2*sc*s+py,sc:sc*s}
+function proj(nx,ny,nz,rx,ry,s,px,py){var ry2=ry*.01745,rx2=rx*.01745;var cr=Math.cos(ry2),sr=Math.sin(ry2),cx=Math.cos(rx2),sx=Math.sin(rx2);var x1=nx*cr-nz*sr,z1=nx*sr+nz*cr;var y2=ny*cx-z1*sx,z2=ny*sx+z1*cx;var p=1200,sc=p/(p+z2);return{sx:innerWidth/2+x1*sc*s+px,sy:innerHeight/2+y2*sc*s+py,sc:sc*s}}
+
+var TL_Y=100; // timeline horizontal Y position
+
+function animate(time){requestAnimationFrame(animate);var t=time*.001;
+if(!drg){if(autoR){trY+=.012;if(trY>Y_LIMIT-5||trY<-Y_LIMIT+5)trY-=.024}else{trY+=vel.x*.92;trX+=vel.y*.92;vel.x*=.94;vel.y*=.94;trY=Math.max(-Y_LIMIT,Math.min(Y_LIMIT,trY));trX=Math.max(-40,Math.min(40,trX))}}
+rX+=(trX-rX)*.07;rY+=(trY-rY)*.07;zm+=(tzm-zm)*.07;panX+=(tpX-panX)*.1;panY+=(tpY-panY)*.1;
+stage.style.transform='translate('+panX+'px,'+panY+'px) scale('+zm+') rotateX('+rX+'deg) rotateY('+rY+'deg)';
+
+// Position cards (float animation)
+for(var i=0;i<N.length;i++){var p=POS[i];var fy=Math.sin(t*.28+i*.7)*4;nEls[N[i].id].el.style.transform='translate3d('+p.x+'px,'+(p.y+fy)+'px,'+p.z+'px)'}
+
+// Position year markers on timeline (aligned with cards' x)
+for(var yi=0;yi<yEls.length;yi++){
+  var yr=yEls[yi];var cp=POS[yr.cardIdx];
+  var syncFy=Math.sin(t*.28+yr.cardIdx*.7)*4;
+  // Year node bobs slightly independently for organic feel
+  var ownFy=Math.sin(t*.5+yi*1.3)*2;
+  yr.el.style.transform='translate3d('+cp.x+'px,'+(TL_Y+ownFy)+'px,0)';
+  yr._x=cp.x;yr._y=TL_Y+ownFy;yr._cx=cp.x;yr._cy=cp.y+syncFy;yr._cz=cp.z;
 }
 
-// ═══ ANIMATE ═══
-function animate(time){
-  requestAnimationFrame(animate);var t=time*.001;
-  if(!drg){if(autoR)trY+=.012;else{trY+=vel.x*.92;trX+=vel.y*.92;vel.x*=.94;vel.y*=.94}}
-  rX+=(trX-rX)*.07;rY+=(trY-rY)*.07;zm+=(tzm-zm)*.07;
-  panX+=(tpX-panX)*.1;panY+=(tpY-panY)*.1;
+cX.clearRect(0,0,cC.width,cC.height);
 
-  stage.style.transform='translate('+panX+'px,'+panY+'px) scale('+zm+') rotateX('+rX+'deg) rotateY('+rY+'deg)';
+// Draw connection curves between cards
+for(var ci=0;ci<CONN.length;ci++){var ai=CONN[ci][0],bi=CONN[ci][1];var ap=POS[ai],bp=POS[bi];var fA=Math.sin(t*.28+ai*.7)*4,fB=Math.sin(t*.28+bi*.7)*4;var pa=proj(ap.x,ap.y+fA,ap.z,rX,rY,zm,panX,panY);var pb=proj(bp.x,bp.y+fB,bp.z,rX,rY,zm,panX,panY);var dx=pb.sx-pa.sx,dy=pb.sy-pa.sy;var ln=Math.sqrt(dx*dx+dy*dy)||1;var nx=-dy/ln,ny=dx/ln;var cv=Math.min(ln*.22,35)*zm;var c1x=pa.sx+dx*.33+nx*cv,c1y=pa.sy+dy*.33+ny*cv;var c2x=pa.sx+dx*.67-nx*cv*.5,c2y=pa.sy+dy*.67-ny*cv*.5;var avgD=Math.min(1,Math.max(.1,(pa.sc+pb.sc)/2));var isSpine=ci>=2&&ci<=7;var gA=isSpine?.015:.008;var lw=isSpine?1.5:1;
+cX.beginPath();cX.moveTo(pa.sx,pa.sy);cX.bezierCurveTo(c1x,c1y,c2x,c2y,pb.sx,pb.sy);cX.strokeStyle='rgba(94,234,212,'+(gA*avgD)+')';cX.lineWidth=7*zm;cX.stroke();
+cX.beginPath();cX.moveTo(pa.sx,pa.sy);cX.bezierCurveTo(c1x,c1y,c2x,c2y,pb.sx,pb.sy);var gr=cX.createLinearGradient(pa.sx,pa.sy,pb.sx,pb.sy);gr.addColorStop(0,N[ai].color+(isSpine?'75':'42'));gr.addColorStop(1,N[bi].color+(isSpine?'75':'42'));cX.strokeStyle=gr;cX.lineWidth=lw*zm;cX.stroke()}
 
-  for(var i=0;i<N.length;i++){
-    var p=POS[i];var fy=Math.sin(t*.28+i*.7)*4;
-    nEls[N[i].id].el.style.transform='translate3d('+p.x+'px,'+(p.y+fy)+'px,'+p.z+'px)';
-  }
-
-  cX.clearRect(0,0,cC.width,cC.height);
-  for(var ci=0;ci<CONN.length;ci++){
-    var ai=CONN[ci][0],bi=CONN[ci][1];
-    var ap=POS[ai],bp=POS[bi];
-    var fA=Math.sin(t*.28+ai*.7)*4,fB=Math.sin(t*.28+bi*.7)*4;
-    var pa=proj(ap.x,ap.y+fA,ap.z,rX,rY,zm,panX,panY);
-    var pb=proj(bp.x,bp.y+fB,bp.z,rX,rY,zm,panX,panY);
-    var dx=pb.sx-pa.sx,dy=pb.sy-pa.sy;var ln=Math.sqrt(dx*dx+dy*dy)||1;
-    var nx=-dy/ln,ny=dx/ln;var cv=Math.min(ln*.22,35)*zm;
-    var c1x=pa.sx+dx*.33+nx*cv,c1y=pa.sy+dy*.33+ny*cv;
-    var c2x=pa.sx+dx*.67-nx*cv*.5,c2y=pa.sy+dy*.67-ny*cv*.5;
-    var avgD=Math.min(1,Math.max(.1,(pa.sc+pb.sc)/2));
-    var isSpine=ci<7;var bA=isSpine?.06:.025;var gA=isSpine?.015:.008;var lw=isSpine?1.5:1;
-    cX.beginPath();cX.moveTo(pa.sx,pa.sy);cX.bezierCurveTo(c1x,c1y,c2x,c2y,pb.sx,pb.sy);
-    cX.strokeStyle='rgba(94,234,212,'+(gA*avgD)+')';cX.lineWidth=7*zm;cX.stroke();
-    cX.beginPath();cX.moveTo(pa.sx,pa.sy);cX.bezierCurveTo(c1x,c1y,c2x,c2y,pb.sx,pb.sy);
-    var gr=cX.createLinearGradient(pa.sx,pa.sy,pb.sx,pb.sy);
-    gr.addColorStop(0,N[ai].color+(isSpine?'70':'40'));gr.addColorStop(1,N[bi].color+(isSpine?'70':'40'));
-    cX.strokeStyle=gr;cX.lineWidth=lw*zm;cX.stroke();
-  }
-  drawBg(t);
+// Draw timeline: connect year nodes with a horizontal glowing curve
+if(yEls.length>1){
+  var pts=[];
+  for(var ki=0;ki<yEls.length;ki++){pts.push(proj(yEls[ki]._x,yEls[ki]._y,0,rX,rY,zm,panX,panY))}
+  // Outer glow
+  cX.beginPath();cX.moveTo(pts[0].sx,pts[0].sy);
+  for(var ki=1;ki<pts.length;ki++){var pp=pts[ki-1],cp=pts[ki];var mx=(pp.sx+cp.sx)/2,my=(pp.sy+cp.sy)/2;cX.quadraticCurveTo(pp.sx,pp.sy,mx,my)}
+  cX.lineTo(pts[pts.length-1].sx,pts[pts.length-1].sy);
+  cX.strokeStyle='rgba(94,234,212,.05)';cX.lineWidth=8*zm;cX.stroke();
+  // Core line
+  cX.beginPath();cX.moveTo(pts[0].sx,pts[0].sy);
+  for(var ki=1;ki<pts.length;ki++){var pp=pts[ki-1],cp=pts[ki];var mx=(pp.sx+cp.sx)/2,my=(pp.sy+cp.sy)/2;cX.quadraticCurveTo(pp.sx,pp.sy,mx,my)}
+  cX.lineTo(pts[pts.length-1].sx,pts[pts.length-1].sy);
+  var tGrad=cX.createLinearGradient(pts[0].sx,pts[0].sy,pts[pts.length-1].sx,pts[pts.length-1].sy);
+  tGrad.addColorStop(0,N[TIMELINE_INDICES[0]].color+'80');
+  tGrad.addColorStop(1,N[TIMELINE_INDICES[TIMELINE_INDICES.length-1]].color+'80');
+  cX.strokeStyle=tGrad;cX.lineWidth=1.5*zm;cX.stroke();
 }
+
+// Draw vertical wires from each timeline card down to its year node
+for(var yi=0;yi<yEls.length;yi++){
+  var yr=yEls[yi];
+  var cardBottom=proj(yr._cx,yr._cy,yr._cz,rX,rY,zm,panX,panY);
+  var yearTop=proj(yr._x,yr._y,0,rX,rY,zm,panX,panY);
+  cX.beginPath();cX.moveTo(cardBottom.sx,cardBottom.sy);cX.lineTo(yearTop.sx,yearTop.sy);
+  var wGrad=cX.createLinearGradient(cardBottom.sx,cardBottom.sy,yearTop.sx,yearTop.sy);
+  wGrad.addColorStop(0,N[yr.cardIdx].color+'00');
+  wGrad.addColorStop(.4,N[yr.cardIdx].color+'40');
+  wGrad.addColorStop(1,N[yr.cardIdx].color+'80');
+  cX.strokeStyle=wGrad;cX.lineWidth=1*zm;cX.stroke();
+}
+
+drawBg(t)}
 requestAnimationFrame(animate);
 window.addEventListener('resize',function(){initBg();szC()});
 </script>
